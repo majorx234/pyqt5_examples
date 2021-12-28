@@ -5,9 +5,9 @@ class ImageListModel(QAbstractListModel):
         super().__init__(*args)
         self.list = []
 
-    def rowCount(self):
-        print("niy")
-        return len(self.list)
+    def rowCount(self, parent=None, *args, **kwargs):
+        if parent:
+            return len(self.list)
 
     def data(self, index, role=None):
         return self.list[index.row()]
