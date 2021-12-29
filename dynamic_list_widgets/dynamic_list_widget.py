@@ -28,4 +28,6 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
     def addImage(self, filename):
         image_item = ImageItem()
         image_item.set_image_from_filename(filename)
+        image = image_item.get_image()
+        self.imageLabel.setPixmap(QPixmap.fromImage(image))
         self.my_model.append(image_item)

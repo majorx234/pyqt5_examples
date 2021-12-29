@@ -19,7 +19,7 @@ class ImageItem(QObject):
         self.data_changed.emit(self)
 
     def get_image(self):
-        return self.img
+        return self.image
 
     def select(self):
         self.selected.emit(self)
