@@ -3,6 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt, QMetaObject
 from image_list_model import ImageListModel
 from image_item_datatype import ImageItem
+from image_item_delegate import ImageItemDelegate
 import sys
 
 from ui_dynamic_list_widget import Ui_dynamic_list_widget
@@ -13,6 +14,8 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.setupUi(parent)
 
         self.my_model = ImageListModel()
+        self.listView.setItemDelegate(ImageItemDelegate(parent = self.listView))
+
         self.listView.setModel(self.my_model)
         #dem lsit view sagen dass er das model hat
         #self.listView

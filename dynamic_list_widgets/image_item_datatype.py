@@ -23,3 +23,7 @@ class ImageItem(QObject):
 
     def select(self):
         self.selected.emit(self)
+
+    def get_thumbnail(self):
+        return self.thumbnail
+    

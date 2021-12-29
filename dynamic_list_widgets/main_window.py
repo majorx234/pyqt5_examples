@@ -19,7 +19,7 @@ class GuiMainWindow(QMainWindow):
 
         openAction = QAction(QIcon('open.png'),'&Open',self)
         openAction.setShortcut('Ctrl+O')
-        #openAction.triggered.connect(self.centralWidget.loadImage)
+        openAction.triggered.connect(self.loadImage)
         
         saveAction = QAction(QIcon('save.png'),'&Save',self)
         saveAction.setShortcut('Ctrl+S')
@@ -41,6 +41,14 @@ class GuiMainWindow(QMainWindow):
                                                         
         self.show()
 
+    def loadImage(self):
+        """ This function will load the user selected image
+            and set it to label using the setPhoto function
+        """
+        filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
+        self.centralWidget.addImage(filename)
+
+        
     def closeEvent(self, event):
             event.accept()
 
