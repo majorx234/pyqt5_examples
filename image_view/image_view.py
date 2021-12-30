@@ -62,13 +62,21 @@ class Image_View(QWidget, ui_image_view.Ui_image_view):
   
         return filtered_image
 
-        
+    def gaussianBlurr(self, img):
+        blurred_image = cv2.GaussianBlur(img, (3, 3), 0)
+        return blurred_image
+
     def update (self):
         """ This function will update the photo according to the
             with filter Matrix
         """
         self.old_image = self.image.copy()
-        img = self.convolutionFilter(self.image)
+        img = self.image
+        if(self.filterTabs.currentWidget() == self.convolutionFilterTab):
+            img = self.convolutionFilter(self.image)
+        elif(self.filterTabs.currentWidget() == self.gaussianFilterTab):
+            img = self.gaussianBlurr(self.image)
+            
         self.setPhoto (img)
         
     def reset(self):
