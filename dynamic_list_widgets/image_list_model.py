@@ -24,6 +24,13 @@ class ImageListModel(QAbstractListModel):
         new_index = self.createIndex(i, 0, self.list[i])
         self.dataChanged.emit(new_index, new_index, [Qt.EditRole])
 
+    def get_last_item(self):
+        # todo: tsten ob es überhaupt ein letztes Bild gibt
+        index = len(self.list)-1
+        last_item = self.list[index]
+        # todo: hier eine Kopie erstellen
+        return last_item 
+
     def clear(self):
         self.list = []
 

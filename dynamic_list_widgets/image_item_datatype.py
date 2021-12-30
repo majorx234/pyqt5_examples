@@ -9,8 +9,10 @@ class ImageItem(QObject):
         self.thumbnail = None
 
     def set_image(self, image):
+        #todo: simplyfy function,reuse code
+        thumb_width = 128
         self.image = image
-        self.thumbnail = self.image.scaleToWidth(thumb_width, mode=Qt.SmoothTransformation)
+        self.thumbnail = self.image.scaledToWidth(thumb_width, mode=Qt.SmoothTransformation)
         self.data_changed.emit(self)
         
     def set_image_from_filename(self, filename, thumb_width=128):

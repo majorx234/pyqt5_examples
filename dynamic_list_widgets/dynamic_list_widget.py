@@ -15,12 +15,8 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
 
         self.my_model = ImageListModel()
         self.listView.setItemDelegate(ImageItemDelegate(parent = self.listView))
-
         self.listView.setModel(self.my_model)
-        #dem lsit view sagen dass er das model hat
-        #self.listView
-
-        #später  self.listView seine delegates geben
+        self.applyButton.clicked.connect(self.apply_filter)
          
     def closeEvent(self, event):
             event.accept()
@@ -31,3 +27,15 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         image = image_item.get_image()
         self.imageLabel.setPixmap(QPixmap.fromImage(image))
         self.my_model.append(image_item)
+
+    def apply_filter(self,event=None):
+        last_item = self.my_model.get_last_item()
+        last_image = last_item.get_image()
+        # todo: filter geshizzle
+        filtered_image = QImage(last_image)
+        image_item = ImageItem()
+        image_item.set_image(filtered_image)
+
+        self.imageLabel.setPixmap(QPixmap.fromImage(filtered_image))
+        self.my_model.append(image_item)
+
