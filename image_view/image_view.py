@@ -26,6 +26,7 @@ class Image_View(QWidget, ui_image_view.Ui_image_view):
         """
         self.filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
         self.image = cv2.imread(self.filename)
+        self.old_image = self.image.copy()
         self.setPhoto(self.image)
 
     def setPhoto(self,image):
@@ -34,7 +35,6 @@ class Image_View(QWidget, ui_image_view.Ui_image_view):
             to set at the label.
         """
         self.tmp = image
-        self.old_image = image
         image = imutils.resize(image, width=400)
         frame = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = QImage(frame, frame.shape[1],frame.shape[0],frame.strides[0],QImage.Format_RGB888)
@@ -76,8 +76,8 @@ class Image_View(QWidget, ui_image_view.Ui_image_view):
             img = self.convolutionFilter(self.image)
         elif(self.filterTabs.currentWidget() == self.gaussianFilterTab):
             img = self.gaussianBlurr(self.image)
-            
-        self.setPhoto (img)
+        self.image = img.copy()    
+        self.setPhoto(img)
         
     def reset(self):
         print("reset")
