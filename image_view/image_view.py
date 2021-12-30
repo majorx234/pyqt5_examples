@@ -42,15 +42,15 @@ class Image_View(QWidget, ui_image_view.Ui_image_view):
         self.labelImage.setPixmap(QPixmap.fromImage(image))
 
     def convolutionFilter(self,img):
-        x0 = int(self.textEdit_0.toPlainText())
-        x1 = int(self.textEdit_1.toPlainText())
-        x2 = int(self.textEdit_2.toPlainText())
-        x3 = int(self.textEdit_3.toPlainText())
-        x4 = int(self.textEdit_4.toPlainText())
-        x5 = int(self.textEdit_5.toPlainText())
-        x6 = int(self.textEdit_6.toPlainText())
-        x7 = int(self.textEdit_7.toPlainText())
-        x8 = int(self.textEdit_8.toPlainText())
+        x0 = float(self.textEdit_0.toPlainText())
+        x1 = float(self.textEdit_1.toPlainText())
+        x2 = float(self.textEdit_2.toPlainText())
+        x3 = float(self.textEdit_3.toPlainText())
+        x4 = float(self.textEdit_4.toPlainText())
+        x5 = float(self.textEdit_5.toPlainText())
+        x6 = float(self.textEdit_6.toPlainText())
+        x7 = float(self.textEdit_7.toPlainText())
+        x8 = float(self.textEdit_8.toPlainText())
 
 
         
