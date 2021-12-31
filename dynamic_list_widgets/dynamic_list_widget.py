@@ -8,6 +8,7 @@ import sys
 import numpy as np
 import cv2
 from cv_to_qt import cv_to_qt_image
+import pyqtgraph as pg
 
 from ui_dynamic_list_widget import Ui_dynamic_list_widget
 
@@ -34,6 +35,13 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         image_item = ImageItem()
         image_item.set_image_from_filename(filename)
         image = image_item.get_image()
+        histogram_plot = pg.PlotWidget()
+        y_axis = self.histogram(image)
+        x_axis = [x for x in range(255)]
+        bargraph = pg.BarGraphItem(x = x_axis, height = y_axis, width = 1, pen ='g')
+        histogram_plot.addItem(bargraph)
+        self.histogramLayout.addWidget(histogram_plot,0,0)
+        
         self.setMainImage(image)
         self.my_model.append(image_item)
         
@@ -111,5 +119,14 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         kernel = np.ones((5,5), np.uint8)
         return cv2.morphologyEx(cv_img, cv2.MORPH_GRADIENT, kernel)
 
-
+    def histogram(self, cv_img):
+        grey_img = self.greyscale(cv_img)
+        #pixelgenau zugriff
+        rows, cols = grey_img.shape
+        histogram = np.zeros(255)
+        for i in range(rows):
+            for j in range(cols):
+                k = grey_img[i,j]
+                histogram[k] += 1
+        return histogram
         

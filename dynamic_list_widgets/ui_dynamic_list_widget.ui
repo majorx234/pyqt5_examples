@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>763</width>
-    <height>670</height>
+    <width>845</width>
+    <height>692</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -298,7 +298,7 @@ p, li { white-space: pre-wrap; }
      <string>creyscale</string>
     </attribute>
    </widget>
-	 <widget class="QWidget" name="thresholdTab">
+   <widget class="QWidget" name="thresholdTab">
     <attribute name="title">
      <string>threshold</string>
     </attribute>
@@ -308,17 +308,17 @@ p, li { white-space: pre-wrap; }
      <string>Erosion</string>
     </attribute>
    </widget>
-	 <widget class="QWidget" name="dilationTab">
+   <widget class="QWidget" name="dilationTab">
     <attribute name="title">
      <string>Dilation</string>
     </attribute>
    </widget>
-	  <widget class="QWidget" name="morphologicalGradientTab">
+   <widget class="QWidget" name="morphologicalGradientTab">
     <attribute name="title">
-     <string>"Morphological Gradient</string>
+     <string>&quot;Morphological Gradient</string>
     </attribute>
    </widget>
-	</widget>
+  </widget>
   <widget class="QPushButton" name="resetButton">
    <property name="geometry">
     <rect>
@@ -331,6 +331,30 @@ p, li { white-space: pre-wrap; }
    <property name="text">
     <string>reset</string>
    </property>
+  </widget>
+  <widget class="QLabel" name="histogramLabel">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>10</y>
+     <width>221</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Histogram</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>600</x>
+     <y>40</y>
+     <width>241</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="histogramLayout"/>
   </widget>
  </widget>
  <resources/>
