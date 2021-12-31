@@ -293,7 +293,32 @@ p, li { white-space: pre-wrap; }
      <string>Gaussian Filter</string>
     </attribute>
    </widget>
-  </widget>
+   <widget class="QWidget" name="greyscaleTab">
+    <attribute name="title">
+     <string>creyscale</string>
+    </attribute>
+   </widget>
+	 <widget class="QWidget" name="thresholdTab">
+    <attribute name="title">
+     <string>threshold</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="erosionTab">
+    <attribute name="title">
+     <string>Erosion</string>
+    </attribute>
+   </widget>
+	 <widget class="QWidget" name="dilationTab">
+    <attribute name="title">
+     <string>Dilation</string>
+    </attribute>
+   </widget>
+	  <widget class="QWidget" name="morphologicalGradientTab">
+    <attribute name="title">
+     <string>"Morphological Gradient</string>
+    </attribute>
+   </widget>
+	</widget>
   <widget class="QPushButton" name="resetButton">
    <property name="geometry">
     <rect>

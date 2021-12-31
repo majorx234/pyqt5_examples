@@ -54,7 +54,17 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
             filtered_image = self.convolutionFilter(last_image)
         elif(self.filterTabs.currentWidget() == self.gaussianFilterTab):
             filtered_image = self.gaussianBlurr(last_image)
-        
+        elif(self.filterTabs.currentWidget() == self.greyscaleTab):
+            filtered_image = self.greyscale(last_image)
+        elif(self.filterTabs.currentWidget() == self.thresholdTab):
+            filtered_image = self.threshold(last_image,150,255)
+        elif(self.filterTabs.currentWidget() == self.erosionTab):
+            filtered_image = self.erosion(last_image)
+        elif(self.filterTabs.currentWidget() == self.dilationTab):
+            filtered_image =  self.dilation(last_image)
+        elif(self.filterTabs.currentWidget() == self.morphologicalGradientTab):
+            filtered_image = self.morphologicalGradient(last_image)
+
         image_item = ImageItem()
         image_item.set_image(filtered_image)
         self.setMainImage(filtered_image)
@@ -82,3 +92,24 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         blurred_image = cv2.GaussianBlur(cv_img, (3, 3), 0)
         return blurred_image
 
+    def greyscale(self,cv_img):
+        return cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
+
+    def threshold(self, cv_img, min, max):
+        r, grey_img = cv2.threshold(cv_img, min, max, cv2.THRESH_BINARY)
+        return grey_img
+
+    def erosion(self, cv_img):
+        kernel = np.ones((5,5), np.uint8)
+        return cv2.erode(cv_img, kernel)
+
+    def dilation(self, cv_img):
+        kernel = np.ones((5,5), np.uint8)
+        return cv2.dilate(cv_img, kernel)
+
+    def morphologicalGradient(self, cv_img):
+        kernel = np.ones((5,5), np.uint8)
+        return cv2.morphologyEx(cv_img, cv2.MORPH_GRADIENT, kernel)
+
+
+        
