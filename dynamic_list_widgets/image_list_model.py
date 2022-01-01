@@ -29,7 +29,12 @@ class ImageListModel(QAbstractListModel):
         index = len(self.list)-1
         last_item = self.list[index]
         # todo: hier eine Kopie erstellen
-        return last_item 
+        return last_item
+
+    def get_penultimate_item(self):
+        index = len(self.list)-2
+        penultimate_item = self.list[index]
+        return penultimate_item
 
     def clear(self):
         self.list = []

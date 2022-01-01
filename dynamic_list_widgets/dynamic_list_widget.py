@@ -21,6 +21,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.listView.setItemDelegate(ImageItemDelegate(parent = self.listView))
         self.listView.setModel(self.my_model)
         self.applyButton.clicked.connect(self.apply_filter)
+        self.resetButton.clicked.connect(self.reset)
          
     def closeEvent(self, event):
             event.accept()
@@ -30,6 +31,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         image_width = 400
         resized_image = qt_image.scaledToWidth(image_width, mode=Qt.SmoothTransformation)
         self.imageLabel.setPixmap(QPixmap.fromImage(resized_image))
+
         # histogram
         histogram_plot = pg.PlotWidget()
         y_axis = self.histogram(cv_image)
@@ -47,10 +49,14 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.my_model.append(image_item)
         
     def reset(self):
-        print("reset")
-        self.image = self.old_image
-        self.setPhoto(self.old_image)
-    
+        penultimate_item = self.my_model.get_penultimate_item()
+        penultimate_image = penultimate_item.get_image()
+        penultimate_image_copy = penultimate_image.copy()
+         
+        image_item = ImageItem()
+        image_item.set_image(penultimate_image_copy)
+        self.setMainImage(penultimate_image_copy)
+        self.my_model.append(image_item)
 
     def apply_filter(self,event=None):
         last_item = self.my_model.get_last_item()
