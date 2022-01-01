@@ -1,8 +1,16 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt, QMetaObject
+from PyQt5.QtCore import Qt, QMetaObject, QTimer
 import sys
+import signal
 from dynamic_list_widget import DynamicListWidget
+
+def sigint_handler(*args):
+    """Handler for the SIGINT signal."""
+    sys.stderr.write('\r')
+    QApplication.quit()
+    sys.exit(0)
+
 
 class GuiMainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -47,14 +55,17 @@ class GuiMainWindow(QMainWindow):
         """
         filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
         self.centralWidget.addImage(filename)
-
         
     def closeEvent(self, event):
             event.accept()
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, sigint_handler)
     app = QApplication(sys.argv)
     main_window = GuiMainWindow()
     main_window.show()
-       
+    # timer for check signal handling
+    timer = QTimer()
+    timer.start(500)  # You may change this if you wish.
+    timer.timeout.connect(lambda: None)   
     sys.exit(app.exec_())
