@@ -30,3 +30,12 @@ class ImageItemDelegate(QStyledItemDelegate):
             qp.restore()
         else:
             super().paint(qp, style_option_view_item, model_index)
+
+    def editorEvent (self, event, model, option, model_index):
+        if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
+            print("left")
+            print(model_index.row())
+        elif event.type() == QEvent.MouseButtonPress and event.button() == Qt.RightButton:
+            print("right")
+            print(model_index.row())
+        return True     

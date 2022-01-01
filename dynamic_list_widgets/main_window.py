@@ -16,14 +16,9 @@ class GuiMainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(GuiMainWindow, self).__init__(parent)
 
-        self.setGeometry(100, 100, 877, 712)
+        self.setGeometry(100, 100, 877, 722)
 
         self.setWindowTitle('Dynamic List View')
-
-        self.centralWidget = DynamicListWidget(self)
-        self.centralWidget.setObjectName("centralwidget")
-
-        self.setCentralWidget(self.centralWidget)
 
         openAction = QAction(QIcon('open.png'),'&Open',self)
         openAction.setShortcut('Ctrl+O')
@@ -38,10 +33,20 @@ class GuiMainWindow(QMainWindow):
         closeAction.triggered.connect(self.close)
         
         self.menuBar = QMenuBar(self)
+        self.setMenuBar(self.menuBar)
         self.fileMenu = self.menuBar.addMenu('&File')
         self.fileMenu.addAction(openAction)
         self.fileMenu.addAction(saveAction)
         self.fileMenu.addAction(closeAction)
+        
+
+        self.centralWidget = DynamicListWidget(self)
+        self.mainLayout = QHBoxLayout(self.centralWidget)
+        self.centralWidget.setLayout(self.mainLayout)
+        self.centralWidget.setObjectName("centralwidget")
+
+        self.setCentralWidget(self.centralWidget)
+ 
         
         self.statusbar = QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
