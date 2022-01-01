@@ -29,19 +29,20 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         qt_image = cv_to_qt_image(cv_image)
         image_width = 400
         resized_image = qt_image.scaledToWidth(image_width, mode=Qt.SmoothTransformation)
-        self.imageLabel.setPixmap(QPixmap.fromImage(resized_image)) 
-        
-    def addImage(self, filename):
-        image_item = ImageItem()
-        image_item.set_image_from_filename(filename)
-        image = image_item.get_image()
+        self.imageLabel.setPixmap(QPixmap.fromImage(resized_image))
+        # histogram
         histogram_plot = pg.PlotWidget()
-        y_axis = self.histogram(image)
+        y_axis = self.histogram(cv_image)
         x_axis = [x for x in range(255)]
         bargraph = pg.BarGraphItem(x = x_axis, height = y_axis, width = 1, pen ='g')
         histogram_plot.addItem(bargraph)
         self.histogramLayout.addWidget(histogram_plot,0,0)
-        
+       
+    def addImage(self, filename):
+        image_item = ImageItem()
+        image_item.set_image_from_filename(filename)
+        image = image_item.get_image()
+         
         self.setMainImage(image)
         self.my_model.append(image_item)
         
@@ -133,10 +134,13 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         return cv2.morphologyEx(cv_img, cv2.MORPH_GRADIENT, kernel)
 
     def histogram(self, cv_img):
-        grey_img = self.greyscale(cv_img)
+        # create greyscale image if needed:
+        grey_img = cv_img
+        if len(cv_img.shape) == 3:
+            grey_img = self.greyscale(cv_img)
         #pixelgenau zugriff
         rows, cols = grey_img.shape
-        histogram = np.zeros(255)
+        histogram = np.zeros(256)
         for i in range(rows):
             for j in range(cols):
                 k = grey_img[i,j]
