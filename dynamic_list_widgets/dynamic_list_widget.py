@@ -58,6 +58,8 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         
         filtered_image = last_image.copy()
 
+        if(self.filterTabs.currentWidget() == self.normalizeTab):
+            filtered_image = self.normalizeImage(last_image)
         if(self.filterTabs.currentWidget() == self.convolutionFilterTab):
             filtered_image = self.convolutionFilter(last_image)
         elif(self.filterTabs.currentWidget() == self.gaussianFilterTab):
@@ -77,7 +79,18 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         image_item.set_image(filtered_image)
         self.setMainImage(filtered_image)
         self.my_model.append(image_item)
-
+        
+    def normalizeImage(self,cv_img):
+        rows = cv_img.shape[0]
+        cols = cv_img.shape[1]
+        normalizedImg = np.zeros((rows, cols))
+        normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_MINMAX)
+        #normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_INF)
+        #normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_L1)
+        #normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_L2)
+ 
+        return normalizedImg
+    
     def convolutionFilter(self, cv_img):
         x0 = float(self.textEdit_0.toPlainText())
         x1 = float(self.textEdit_1.toPlainText())

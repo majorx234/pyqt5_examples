@@ -61,6 +61,11 @@
    <property name="currentIndex">
     <number>0</number>
    </property>
+   <widget class="QWidget" name="normalizeTab">
+    <attribute name="title">
+     <string>normalize</string>
+    </attribute>
+   </widget> 
    <widget class="QWidget" name="convolutionFilterTab">
     <attribute name="title">
      <string>Convolution Filter</string>
@@ -295,7 +300,7 @@ p, li { white-space: pre-wrap; }
    </widget>
    <widget class="QWidget" name="greyscaleTab">
     <attribute name="title">
-     <string>creyscale</string>
+     <string>greyscale</string>
     </attribute>
    </widget>
    <widget class="QWidget" name="thresholdTab">
