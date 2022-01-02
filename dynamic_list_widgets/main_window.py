@@ -26,7 +26,7 @@ class GuiMainWindow(QMainWindow):
         
         saveAction = QAction(QIcon('save.png'),'&Save',self)
         saveAction.setShortcut('Ctrl+S')
-        #saveAction.triggered.connect(self.centralWidget.savePhoto)
+        saveAction.triggered.connect(self.saveImage)
 
         closeAction = QAction(QIcon('close.png'),'&Close',self)
         closeAction.setShortcut('Ctrl+C')
@@ -60,6 +60,13 @@ class GuiMainWindow(QMainWindow):
         """
         filename = QFileDialog.getOpenFileName(filter="Image (*.*)")[0]
         self.centralWidget.addImage(filename)
+
+    def saveImage(self):
+        """ This function will save the image
+
+        """
+        self.centralWidget.saveImage()
+
         
     def closeEvent(self, event):
             event.accept()

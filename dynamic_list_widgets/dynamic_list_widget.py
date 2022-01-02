@@ -25,6 +25,18 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
          
     def closeEvent(self, event):
             event.accept()
+
+    def saveImage(self):
+        """ This function will save the image
+
+        """
+        last_item = self.my_model.get_last_item()
+        last_image = last_item.get_image()
+        filename = "test.jpg"
+        filename = QFileDialog.getSaveFileName (filter="JPG (*.jpg);;PNG (*.png);;TIFF (*.tiff);;BMP (*.bmp)")[0]
+        cv2.imwrite(filename, last_image)
+        print ('Image saved as:', filename)
+
             
     def setMainImage(self, cv_image):
         qt_image = cv_to_qt_image(cv_image)
@@ -61,7 +73,6 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
     def apply_filter(self,event=None):
         last_item = self.my_model.get_last_item()
         last_image = last_item.get_image()
-        # todo: filter geshizzle
         
         filtered_image = last_image.copy()
 
