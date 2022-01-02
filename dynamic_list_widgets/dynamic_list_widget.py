@@ -92,6 +92,8 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
             filtered_image =  self.dilation(last_image)
         elif(self.filterTabs.currentWidget() == self.morphologicalGradientTab):
             filtered_image = self.morphologicalGradient(last_image)
+        elif(self.filterTabs.currentWidget() == self.facedetectionTab):
+            filtered_image = self.haarcascade_face_detection(last_image)
 
         image_item = ImageItem()
         image_item.set_image(filtered_image)
@@ -99,14 +101,22 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.my_model.append(image_item)
         
     def normalizeImage(self,cv_img):
+        selected_norm = self.normCombobox.currentText()
         rows = cv_img.shape[0]
         cols = cv_img.shape[1]
         normalizedImg = np.zeros((rows, cols))
-        normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_MINMAX)
-        #normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_INF)
-        #normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_L1)
-        #normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_L2)
- 
+        if(selected_norm == 'MinMax'):
+            normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_MINMAX)
+            print(selected_norm)
+        elif(selected_norm == 'INF'):
+            print(selected_norm)
+            normalizedImg2 = cv2.normalize(cv_img,  normalizedImg, 0, 1, cv2.NORM_INF, dtype=cv2.CV_32F)
+            normalizedImg2 *=255
+            normalizedImg = np.uint8(normalizedImg2)
+        elif(selected_norm == 'L1'):
+            normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 1, cv2.NORM_L1, dtype=cv2.CV_32F)
+        elif(selected_norm == 'L2'):
+            normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 1, cv2.NORM_L2, dtype=cv2.CV_32F)
         return normalizedImg
     
     def convolutionFilter(self, cv_img):
@@ -163,4 +173,15 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
                 k = grey_img[i,j]
                 histogram[k] += 1
         return histogram
-        
+
+    def haarcascade_face_detection(self,cv_img):
+        xml_cascade_file = '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
+        # detect face
+        face_cascade = cv2.CascadeClassifier(xml_cascade_file)
+        faces = face_cascade.detectMultiScale(cv_img)
+        faces_img = cv_img.copy()
+
+        #mark faces in image
+        for (x, y, w, h) in faces:
+            cv2.rectangle(faces_img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        return faces_img

@@ -32,7 +32,6 @@
     <property name="spacing">
      <number>0</number>
     </property>
-
     <item>
      <widget class="QListView" name="listView">
       <property name="minimumSize">
@@ -88,12 +87,90 @@
          </size>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="normalizeTab">
          <attribute name="title">
-          <string>normalize</string>
+          <string>Normalize</string>
          </attribute>
+         <widget class="QWidget" name="horizontalLayoutWidget_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>411</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Maximum</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>3</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="normLabel">
+             <property name="layoutDirection">
+              <enum>Qt::RightToLeft</enum>
+             </property>
+             <property name="text">
+              <string>Norm:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="normCombobox">
+             <item>
+              <property name="text">
+               <string>MinMax</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>INF</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>L1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>L2</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
         </widget>
         <widget class="QWidget" name="convolutionFilterTab">
          <attribute name="title">
@@ -329,12 +406,12 @@ p, li { white-space: pre-wrap; }
         </widget>
         <widget class="QWidget" name="greyscaleTab">
          <attribute name="title">
-          <string>greyscale</string>
+          <string>Greyscale</string>
          </attribute>
         </widget>
         <widget class="QWidget" name="thresholdTab">
          <attribute name="title">
-          <string>threshold</string>
+          <string>Threshold</string>
          </attribute>
         </widget>
         <widget class="QWidget" name="erosionTab">
@@ -349,7 +426,12 @@ p, li { white-space: pre-wrap; }
         </widget>
         <widget class="QWidget" name="morphologicalGradientTab">
          <attribute name="title">
-          <string>&quot;Morphological Gradient</string>
+          <string>Morphological Gradient</string>
+         </attribute>
+        </widget>
+				<widget class="QWidget" name="facedetectionTab">
+         <attribute name="title">
+          <string>Facedetection</string>
          </attribute>
         </widget>
        </widget>
