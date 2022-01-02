@@ -33,7 +33,6 @@ class GuiMainWindow(QMainWindow):
         closeAction.triggered.connect(self.close)
         
         self.menuBar = QMenuBar(self)
-        self.setMenuBar(self.menuBar)
         self.fileMenu = self.menuBar.addMenu('&File')
         self.fileMenu.addAction(openAction)
         self.fileMenu.addAction(saveAction)
@@ -47,6 +46,7 @@ class GuiMainWindow(QMainWindow):
 
         self.setCentralWidget(self.centralWidget)
  
+        self.setMenuBar(self.menuBar)
         
         self.statusbar = QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
