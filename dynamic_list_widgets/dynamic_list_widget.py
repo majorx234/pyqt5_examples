@@ -17,12 +17,22 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         super(QWidget, self).__init__(parent)
         self.setupUi(parent)
 
-        self.my_model = ImageListModel()
-        self.listView.setItemDelegate(ImageItemDelegate(parent = self.listView))
-        self.listView.setModel(self.my_model)
+        self.historyListModel = ImageListModel()
+        self.historyListDelegate = ImageItemDelegate(parent = self.historyListView)
+        self.historyListView.setItemDelegate(self.historyListDelegate)
+        self.historyListView.setModel(self.historyListModel)
+
+        self.selectedFacesListModel = ImageListModel()
+        self.selectedFacesListDelegate = ImageItemDelegate(parent = self.selectedFacesListView)
+        self.selectedFacesListView.setItemDelegate(self.selectedFacesListDelegate)
+        self.selectedFacesListView.setModel(self.selectedFacesListModel)
+
+        self.historyListDelegate.on_clicked.connect(self.selectImageFromList)
         self.applyButton.clicked.connect(self.apply_filter)
         self.resetButton.clicked.connect(self.reset)
-         
+        self.imageLabel.mousePressEvent = self.getPos
+        self.current_faces = []
+        self.current_image = None
     def closeEvent(self, event):
             event.accept()
 
@@ -30,7 +40,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         """ This function will save the image
 
         """
-        last_item = self.my_model.get_last_item()
+        last_item = self.historyListModel.get_last_item()
         last_image = last_item.get_image()
         filename = "test.jpg"
         filename = QFileDialog.getSaveFileName (filter="JPG (*.jpg);;PNG (*.png);;TIFF (*.tiff);;BMP (*.bmp)")[0]
@@ -58,22 +68,31 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         image = image_item.get_image()
          
         self.setMainImage(image)
-        self.my_model.append(image_item)
+        self.historyListModel.append(image_item)
         
     def reset(self):
-        penultimate_item = self.my_model.get_penultimate_item()
+        penultimate_item = self.historyListModel.get_penultimate_item()
         penultimate_image = penultimate_item.get_image()
         penultimate_image_copy = penultimate_image.copy()
          
         image_item = ImageItem()
         image_item.set_image(penultimate_image_copy)
         self.setMainImage(penultimate_image_copy)
-        self.my_model.append(image_item)
+        self.historyListModel.append(image_item)
 
-    def apply_filter(self,event=None):
-        last_item = self.my_model.get_last_item()
-        last_image = last_item.get_image()
+    def selectImageFromList(self, index, mouse_button):
+        indexed_item = self.historyListModel.get_item(index)
+        indexed_image = indexed_item.get_image()
+       
+        image_item = ImageItem()
+        image_item.set_image(indexed_image.copy())
+        self.setMainImage(indexed_image)
+        self.historyListModel.append(image_item)
         
+    def apply_filter(self,event=None):
+        last_item = self.historyListModel.get_last_item()
+        last_image = last_item.get_image()
+        print(type(last_image))
         filtered_image = last_image.copy()
 
         if(self.filterTabs.currentWidget() == self.normalizeTab):
@@ -98,7 +117,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         image_item = ImageItem()
         image_item.set_image(filtered_image)
         self.setMainImage(filtered_image)
-        self.my_model.append(image_item)
+        self.historyListModel.append(image_item)
         
     def normalizeImage(self,cv_img):
         selected_norm = self.normCombobox.currentText()
@@ -180,8 +199,21 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         face_cascade = cv2.CascadeClassifier(xml_cascade_file)
         faces = face_cascade.detectMultiScale(cv_img)
         faces_img = cv_img.copy()
-
+        self.current_faces = faces
         #mark faces in image
         for (x, y, w, h) in faces:
             cv2.rectangle(faces_img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        self.current_image = faces_img.copy()    
         return faces_img
+
+    def getPos(self, event):
+        p_x = event.pos().x()
+        p_y = event.pos().y()
+        cv_img = self.current_image
+        if(len(self.current_faces)>0):
+            for (x, y, w, h) in self.current_faces:
+                if(p_y > y) and (p_y < y +h) and (p_x > x) and (p_x < x+w):
+                    face_image = cv_img[y:y+h, x:x+w]
+                    image_item = ImageItem()
+                    image_item.set_image(face_image)
+                    self.selectedFacesListModel.append(image_item)

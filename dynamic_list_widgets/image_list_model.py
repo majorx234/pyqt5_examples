@@ -36,6 +36,10 @@ class ImageListModel(QAbstractListModel):
         penultimate_item = self.list[index]
         return penultimate_item
 
+    def get_item(self,index):
+        item = self.list[index]
+        return item
+
     def clear(self):
         self.list = []
 

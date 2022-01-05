@@ -18,7 +18,6 @@ class ImageItem(QObject):
     def set_image_from_filename(self, filename):
         self.set_image(cv2.imread(filename))
 
-
     def get_image(self):
         return self.cv_image
 

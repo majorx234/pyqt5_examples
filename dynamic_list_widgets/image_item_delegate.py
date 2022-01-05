@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QSize, QEvent
+from PyQt5.QtCore import Qt, QSize, QEvent, pyqtSignal
 from PyQt5.QtWidgets import QStyledItemDelegate
 from PyQt5.QtGui import QPen, QBrush, QPainter, QColor, QMouseEvent
 
@@ -6,6 +6,7 @@ from image_item_datatype import ImageItem
 from cv_to_qt import cv_to_qt_image
 
 class ImageItemDelegate(QStyledItemDelegate):
+    on_clicked = pyqtSignal(int,Qt.MouseButton)
     def __init__(self, parent=None, *args):
         super().__init__(*args)
         self.setParent(parent)
@@ -32,10 +33,8 @@ class ImageItemDelegate(QStyledItemDelegate):
             super().paint(qp, style_option_view_item, model_index)
 
     def editorEvent (self, event, model, option, model_index):
-        if event.type() == QEvent.MouseButtonPress and event.button() == Qt.LeftButton:
-            print("left")
-            print(model_index.row())
-        elif event.type() == QEvent.MouseButtonPress and event.button() == Qt.RightButton:
-            print("right")
-            print(model_index.row())
+        if event.type() == QEvent.MouseButtonPress:
+            mouse_button =  event.button()
+            item_index = model_index.row()
+            self.on_clicked.emit(item_index, mouse_button)
         return True     
