@@ -4,11 +4,11 @@ import cv2, imutils
 
 class ImageItem(QObject):
     data_changed = pyqtSignal(QObject)
-    def __init__(self, *args):
+    def __init__(self, thumb_width=128, *args):
         super().__init__(*args)
         self.cv_image = None
         self.cv_thumbnail = None
-        self.thumb_width = 128
+        self.thumb_width = thumb_width 
 
     def set_image(self, image):
         self.cv_image = image
