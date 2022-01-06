@@ -30,9 +30,11 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.historyListDelegate.on_clicked.connect(self.selectImageFromList)
         self.applyButton.clicked.connect(self.apply_filter)
         self.resetButton.clicked.connect(self.reset)
+        self.resetFacedetectionButton.clicked.connect(self.resetFacedetection)
         self.imageLabel.mousePressEvent = self.getPos
         self.current_faces = []
         self.current_image = None
+        
     def closeEvent(self, event):
             event.accept()
 
@@ -80,6 +82,10 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.setMainImage(penultimate_image_copy)
         self.historyListModel.append(image_item)
 
+    def resetFacedetection(self):
+        self.setMainImage(self.current_image)
+        self.current_faces = []
+
     def selectImageFromList(self, index, mouse_button):
         indexed_item = self.historyListModel.get_item(index)
         indexed_image = indexed_item.get_image()
@@ -112,12 +118,24 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         elif(self.filterTabs.currentWidget() == self.morphologicalGradientTab):
             filtered_image = self.morphologicalGradient(last_image)
         elif(self.filterTabs.currentWidget() == self.facedetectionTab):
-            filtered_image = self.haarcascade_face_detection(last_image)
+            filtered_image = last_image
+            self.current_faces = self.haarcascade_face_detection(last_image)
 
         image_item = ImageItem(thumb_width=128)
         image_item.set_image(filtered_image)
-        self.setMainImage(filtered_image)
         self.historyListModel.append(image_item)
+        
+        self.current_image = filtered_image
+        #draw faces in label
+        if(len(self.current_faces) !=0):
+            faces_img = last_image.copy()
+            #mark faces in image
+            for (x, y, w, h) in self.current_faces:
+                cv2.rectangle(faces_img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            filtered_image = faces_img    
+       
+        self.setMainImage(filtered_image)
+        
         
     def normalizeImage(self,cv_img):
         selected_norm = self.normCombobox.currentText()
@@ -198,13 +216,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         # detect face
         face_cascade = cv2.CascadeClassifier(xml_cascade_file)
         faces = face_cascade.detectMultiScale(cv_img)
-        faces_img = cv_img.copy()
-        self.current_faces = faces
-        #mark faces in image
-        for (x, y, w, h) in faces:
-            cv2.rectangle(faces_img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        self.current_image = faces_img.copy()    
-        return faces_img
+        return faces
 
     def getPos(self, event):
         p_x = event.pos().x()

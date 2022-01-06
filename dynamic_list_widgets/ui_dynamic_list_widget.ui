@@ -495,14 +495,21 @@ p, li { white-space: pre-wrap; }
       <item>
        <widget class="QPushButton" name="applyButton">
         <property name="text">
-         <string>apply</string>
+         <string>Apply Filter</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="resetButton">
         <property name="text">
-         <string>reset</string>
+         <string>Reset Filter</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="resetFacedetectionButton">
+        <property name="text">
+         <string>Reset Facedetection</string>
         </property>
        </widget>
       </item>
