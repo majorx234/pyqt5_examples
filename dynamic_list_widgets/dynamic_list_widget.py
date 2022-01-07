@@ -1,16 +1,15 @@
+import numpy as np
+import cv2
+import pyqtgraph as pg
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt, QMetaObject
 from image_list_model import ImageListModel
 from image_item_datatype import ImageItem
 from image_item_delegate import ImageItemDelegate
-import sys
-import numpy as np
-import cv2
 from cv_to_qt import cv_to_qt_image
-import pyqtgraph as pg
-
 from ui_dynamic_list_widget import Ui_dynamic_list_widget
+import image_filter as ft
 
 class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
     def __init__(self, parent=None):
@@ -49,8 +48,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         cv2.imwrite(filename, last_image)
         print ('Image saved as:', filename)
 
-            
-    def setMainImage(self, cv_image):
+    def set_main_image(self, cv_image):
         qt_image = cv_to_qt_image(cv_image)
         image_width = 400
         resized_image = qt_image.scaledToWidth(image_width, mode=Qt.SmoothTransformation)
@@ -69,7 +67,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         image_item.set_image_from_filename(filename)
         image = image_item.get_image()
          
-        self.setMainImage(image)
+        self.set_main_image(image)
         self.historyListModel.append(image_item)
         
     def reset(self):
@@ -79,11 +77,11 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
          
         image_item = ImageItem(thumb_width=128)
         image_item.set_image(penultimate_image_copy)
-        self.setMainImage(penultimate_image_copy)
+        self.set_main_image(penultimate_image_copy)
         self.historyListModel.append(image_item)
 
     def resetFacedetection(self):
-        self.setMainImage(self.current_image)
+        self.set_main_image(self.current_image)
         self.current_faces = []
 
     def selectImageFromList(self, index, mouse_button):
@@ -92,7 +90,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
        
         image_item = ImageItem(thumb_width=128)
         image_item.set_image(indexed_image.copy())
-        self.setMainImage(indexed_image)
+        self.set_main_image(indexed_image)
         self.historyListModel.append(image_item)
         
     def apply_filter(self,event=None):
@@ -102,19 +100,21 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         filtered_image = last_image.copy()
 
         if(self.filterTabs.currentWidget() == self.normalizeTab):
-            filtered_image = self.normalizeImage(last_image)
-        if(self.filterTabs.currentWidget() == self.convolutionFilterTab):
-            filtered_image = self.convolutionFilter(last_image)
+            selected_norm = self.get_selected_norm()
+            filtered_image = ft.normalizeImage(last_image, selected_norm)
+        if(self.filterTabs.currentWidget() == self.convolutionFilterTab):          
+            filter_kernel = self.get_convolution_kernel()
+            filtered_image = ft.convolutionFilter(last_image, filter_kernel)
         elif(self.filterTabs.currentWidget() == self.gaussianFilterTab):
-            filtered_image = self.gaussianBlurr(last_image)
+            filtered_image = ft.gaussianBlurr(last_image)
         elif(self.filterTabs.currentWidget() == self.greyscaleTab):
-            filtered_image = self.greyscale(last_image)
+            filtered_image = ft.greyscale(last_image)
         elif(self.filterTabs.currentWidget() == self.thresholdTab):
-            filtered_image = self.threshold(last_image,150,255)
+            filtered_image = ft.threshold(last_image,150,255)
         elif(self.filterTabs.currentWidget() == self.erosionTab):
-            filtered_image = self.erosion(last_image)
+            filtered_image = ft.erosion(last_image)
         elif(self.filterTabs.currentWidget() == self.dilationTab):
-            filtered_image =  self.dilation(last_image)
+            filtered_image =  ft.dilation(last_image)
         elif(self.filterTabs.currentWidget() == self.morphologicalGradientTab):
             filtered_image = self.morphologicalGradient(last_image)
         elif(self.filterTabs.currentWidget() == self.facedetectionTab):
@@ -134,74 +134,13 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
                 cv2.rectangle(faces_img, (x, y), (x + w, y + h), (0, 0, 255), 2)
             filtered_image = faces_img    
        
-        self.setMainImage(filtered_image)
+        self.set_main_image(filtered_image)
         
-        
-    def normalizeImage(self,cv_img):
-        selected_norm = self.normCombobox.currentText()
-        rows = cv_img.shape[0]
-        cols = cv_img.shape[1]
-        normalizedImg = np.zeros((rows, cols))
-        if(selected_norm == 'MinMax'):
-            normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 255, cv2.NORM_MINMAX)
-            print(selected_norm)
-        elif(selected_norm == 'INF'):
-            print(selected_norm)
-            normalizedImg2 = cv2.normalize(cv_img,  normalizedImg, 0, 1, cv2.NORM_INF, dtype=cv2.CV_32F)
-            normalizedImg2 *=255
-            normalizedImg = np.uint8(normalizedImg2)
-        elif(selected_norm == 'L1'):
-            normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 1, cv2.NORM_L1, dtype=cv2.CV_32F)
-        elif(selected_norm == 'L2'):
-            normalizedImg = cv2.normalize(cv_img,  normalizedImg, 0, 1, cv2.NORM_L2, dtype=cv2.CV_32F)
-        return normalizedImg
-    
-    def convolutionFilter(self, cv_img):
-        x0 = float(self.textEdit_0.toPlainText())
-        x1 = float(self.textEdit_1.toPlainText())
-        x2 = float(self.textEdit_2.toPlainText())
-        x3 = float(self.textEdit_3.toPlainText())
-        x4 = float(self.textEdit_4.toPlainText())
-        x5 = float(self.textEdit_5.toPlainText())
-        x6 = float(self.textEdit_6.toPlainText())
-        x7 = float(self.textEdit_7.toPlainText())
-        x8 = float(self.textEdit_8.toPlainText())
-        
-        filter_kernel  = np.array([[x0,x1,x2],
-                                  [x3,x4,x5],
-                                  [x6,x7,x8]])
-
-        filtered_image = cv2.filter2D(cv_img, -1, filter_kernel)
-        return filtered_image    
-
-    def gaussianBlurr(self, cv_img):
-        blurred_image = cv2.GaussianBlur(cv_img, (3, 3), 0)
-        return blurred_image
-
-    def greyscale(self,cv_img):
-        return cv2.cvtColor(cv_img, cv2.COLOR_BGR2GRAY)
-
-    def threshold(self, cv_img, min, max):
-        r, grey_img = cv2.threshold(cv_img, min, max, cv2.THRESH_BINARY)
-        return grey_img
-
-    def erosion(self, cv_img):
-        kernel = np.ones((5,5), np.uint8)
-        return cv2.erode(cv_img, kernel)
-
-    def dilation(self, cv_img):
-        kernel = np.ones((5,5), np.uint8)
-        return cv2.dilate(cv_img, kernel)
-
-    def morphologicalGradient(self, cv_img):
-        kernel = np.ones((5,5), np.uint8)
-        return cv2.morphologyEx(cv_img, cv2.MORPH_GRADIENT, kernel)
-
     def histogram(self, cv_img):
         # create greyscale image if needed:
         grey_img = cv_img
         if len(cv_img.shape) == 3:
-            grey_img = self.greyscale(cv_img)
+            grey_img = ft.greyscale(cv_img)
         #pixelgenau zugriff
         rows, cols = grey_img.shape
         histogram = np.zeros(256)
@@ -229,3 +168,23 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
                     image_item = ImageItem(thumb_width=64)
                     image_item.set_image(face_image)
                     self.selectedFacesListModel.append(image_item)
+
+    def get_selected_norm(self):
+        return self.normCombobox.currentText()
+
+    def get_convolution_kernel(self):
+        x0 = float(self.textEdit_0.toPlainText())
+        x1 = float(self.textEdit_1.toPlainText())
+        x2 = float(self.textEdit_2.toPlainText())
+        x3 = float(self.textEdit_3.toPlainText())
+        x4 = float(self.textEdit_4.toPlainText())
+        x5 = float(self.textEdit_5.toPlainText())
+        x6 = float(self.textEdit_6.toPlainText())
+        x7 = float(self.textEdit_7.toPlainText())
+        x8 = float(self.textEdit_8.toPlainText())
+
+        return np.array([[x0,x1,x2],
+                        [x3,x4,x5],
+                        [x6,x7,x8]])
+
+    
