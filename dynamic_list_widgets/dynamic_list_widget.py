@@ -23,6 +23,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
 
         self.selectedFacesListModel = ImageListModel()
         self.selectedFacesListDelegate = ImageItemDelegate(parent = self.selectedFacesListView)
+        self.selectedFacesListDelegate.doubleClicked.connect(self.whoDoubleclicked)
         self.selectedFacesListView.setItemDelegate(self.selectedFacesListDelegate)
         self.selectedFacesListView.setModel(self.selectedFacesListModel)
 
@@ -33,6 +34,9 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.imageLabel.mousePressEvent = self.getPos
         self.current_faces = []
         self.current_image = None
+
+    def whoDoubleclicked(self, index):
+        print("doubleclicked {}".format(index))
         
     def closeEvent(self, event):
             event.accept()

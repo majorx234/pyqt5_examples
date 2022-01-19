@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QSize, QEvent, pyqtSignal
+from PyQt5.QtCore import Qt, QSize, QEvent, pyqtSignal, QTimer
 from PyQt5.QtWidgets import QStyledItemDelegate
 from PyQt5.QtGui import QPen, QBrush, QPainter, QColor, QMouseEvent
 
@@ -6,10 +6,28 @@ from image_item_datatype import ImageItem
 from cv_to_qt import cv_to_qt_image
 
 class ImageItemDelegate(QStyledItemDelegate):
-    on_clicked = pyqtSignal(int,Qt.MouseButton)
+    on_clicked = pyqtSignal(int, Qt.MouseButton)
+    doubleClicked = pyqtSignal(int)
     def __init__(self, parent=None, *args):
         super().__init__(*args)
         self.setParent(parent)
+
+        self.timer = QTimer()
+        self.timer.setSingleShot(True)
+        #self.timer.timeout.connect(self.on_clicked.emit)
+        self.on_clicked.connect(self.checkDoubleClick)
+
+    def checkDoubleClick(self, index, mouse_button):
+        if self.timer.isActive():
+            print("second")
+            #if (self.timer<250):
+            #    self.doubleClicked.emit(index)
+            #    self.timer.stop()
+            #else:
+            #    self.timer.start()
+        else:
+            print("first")
+            self.timer.start(250)
         
     def sizeHint(self,style_option_view_item, model_index):
         model_index_data = model_index.data()
