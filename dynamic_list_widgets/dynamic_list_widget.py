@@ -3,7 +3,7 @@ import cv2
 import pyqtgraph as pg
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt, QMetaObject
+from PyQt5.QtCore import Qt, QMetaObject, QEvent
 from image_list_model import ImageListModel
 from image_item_datatype import ImageItem
 from image_item_delegate import ImageItemDelegate
@@ -34,12 +34,26 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.imageLabel.mousePressEvent = self.getPos
         self.current_faces = []
         self.current_image = None
+        self.selectedFacesListView.installEventFilter(self)
 
     def whoDoubleclicked(self, index):
         print("doubleclicked {}".format(index))
         
     def closeEvent(self, event):
             event.accept()
+
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.ContextMenu and source is self.selectedFacesListView:
+            menu = QMenu(self)
+            menu.addAction("New")
+            menu.addAction("Open")
+
+            if menu.exec_(event.globalPos()):
+                item = source.itemAt(event.pos())
+                print(item.text())
+                return True
+        return super().eventFilter(source, event)
+ 
 
     def saveImage(self):
         """ This function will save the image
@@ -52,6 +66,18 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         cv2.imwrite(filename, last_image)
         print ('Image saved as:', filename)
 
+    def selectFaceFromList(self, index, mouse_button):
+        print("i do nothing yet")
+        #if(mouse_button == ):
+            #create contextmenu
+            #saveFaceImage
+            
+    def saveFaceImage(self,index):
+        indexed_item = self.selectedFacesListModel.get_item(index)
+        indexed_image = indexed_item.get_image()
+        filename = QFileDialog.getSaveFileName (filter="JPG (*.jpg);;PNG (*.png);;TIFF (*.tiff);;BMP (*.bmp)")[0]
+        cv2.imwrite(filename, indexed_image)
+     
     def set_main_image(self, cv_image):
         qt_image = cv_to_qt_image(cv_image)
         image_width = 400

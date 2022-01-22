@@ -51,7 +51,7 @@ class GuiMainWindow(QMainWindow):
         self.statusbar = QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
         self.setStatusBar(self.statusbar)
-                                                        
+
         self.show()
 
     def loadImage(self):
@@ -63,11 +63,9 @@ class GuiMainWindow(QMainWindow):
 
     def saveImage(self):
         """ This function will save the image
-
         """
         self.centralWidget.saveImage()
-
-        
+       
     def closeEvent(self, event):
             event.accept()
 
