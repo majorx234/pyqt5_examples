@@ -36,6 +36,13 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.current_image = None
         self.selectedFacesListView.installEventFilter(self)
 
+        self.imageOriginalWidth = 0
+        self.imageOriginalHeight = 0
+        self.scaleFactorWidth = 1.0
+        self.scaleFactorHeight = 1.0
+        self.labelWidth = 400
+        self.labelHeight = 400
+
     def whoDoubleclicked(self, index):
         print("doubleclicked {}".format(index))
         
@@ -57,7 +64,6 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
 
     def saveImage(self):
         """ This function will save the image
-
         """
         last_item = self.historyListModel.get_last_item()
         last_image = last_item.get_image()
@@ -80,10 +86,9 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
      
     def set_main_image(self, cv_image):
         qt_image = cv_to_qt_image(cv_image)
-        image_width = 400
-        resized_image = qt_image.scaledToWidth(image_width, mode=Qt.SmoothTransformation)
+        (resized_image, self.scaledFactorWidth, self.scaleFactorHeight) = self.scaledImageToLabel(qt_image.copy(), self.labelWidth, self.labelHeight)
         self.imageLabel.setPixmap(QPixmap.fromImage(resized_image))
-
+        
         # histogram
         histogram_plot = pg.PlotWidget()
         y_axis = self.histogram(cv_image)
@@ -122,7 +127,27 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         image_item.set_image(indexed_image.copy())
         self.set_main_image(indexed_image)
         self.historyListModel.append(image_item)
-        
+
+    def scaledImageToLabel(self, qt_image : QImage, label_width, label_height ) -> (QImage, float, float):
+        image_width = qt_image.width()
+        image_height = qt_image.height()
+        ratio = image_width / image_height
+        scaledFactorWidth = 1.0
+        scaledFactorHeight = 1.0
+        if ratio == 1 :
+            resized_image = qt_image.scaledToWidth(label_width, mode=Qt.SmoothTransformation)
+            scaledFactorWidth = label_width/image_width
+            scaledFactorHeight = label_height/image_height
+        elif ratio < 1 :
+            resized_image = qt_image.scaledToHeight(label_height, mode=Qt.SmoothTransformation)
+            scaledFactorHeight = label_height/image_height
+            scaledFactorWidth = scaledFactorHeight
+        else : #ratio > 1:
+            resized_image = qt_image.scaledToWidth(label_width, mode=Qt.SmoothTransformation)
+            scaledFactorWidth = label_width/image_width
+            scaledFactorHeight = scaledFactorWidth
+        return resized_image, scaledFactorWidth, scaledFactorHeight
+    
     def apply_filter(self,event=None):
         last_item = self.historyListModel.get_last_item()
         last_image = last_item.get_image()
@@ -188,8 +213,12 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         return faces
 
     def getPos(self, event):
-        p_x = event.pos().x()
-        p_y = event.pos().y()
+        label_x = event.pos().x()
+        label_y = event.pos().y()
+
+        p_x = label_x / self.scaledFactorWidth
+        p_y = label_y / self.scaleFactorHeight
+
         cv_img = self.current_image
         if(len(self.current_faces)>0):
             for (x, y, w, h) in self.current_faces:

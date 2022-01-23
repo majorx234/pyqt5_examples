@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 def normalizeImage(cv_img, selected_norm):
     rows = cv_img.shape[0]
