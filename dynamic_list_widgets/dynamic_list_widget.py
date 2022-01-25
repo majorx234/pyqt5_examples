@@ -24,7 +24,6 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
 
         self.selectedFacesListModel = ImageListModel()
         self.selectedFacesListDelegate = ImageItemDelegate(parent = self.selectedFacesListView)
-        self.selectedFacesListDelegate.doubleClicked.connect(self.whoDoubleclicked)
         self.selectedFacesListView.setItemDelegate(self.selectedFacesListDelegate)
         self.selectedFacesListView.setModel(self.selectedFacesListModel)
 
@@ -54,8 +53,9 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
             menu.addAction("Delete")
 
             if menu.exec_(event.globalPos()):
-                item = source.itemAt(event.pos())
-                print(item.text())
+                model_index = self.selectedFacesListView.indexAt(event.pos())
+                filename = QFileDialog.getSaveFileName (filter="JPG (*.jpg);;PNG (*.png);;TIFF (*.tiff);;BMP (*.bmp)")[0]
+                cv2.imwrite(filename, model_index.data().get_image())
                 return True
         return super().eventFilter(source, event)
  
