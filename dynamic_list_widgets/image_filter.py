@@ -46,3 +46,9 @@ def morphologicalGradient(cv_img):
     kernel = np.ones((5,5), np.uint8)
     return cv2.morphologyEx(cv_img, cv2.MORPH_GRADIENT, kernel)
  
+def haarcascade_face_detection(cv_img):
+    xml_cascade_file = '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
+    # detect face
+    face_cascade = cv2.CascadeClassifier(xml_cascade_file)
+    faces = face_cascade.detectMultiScale(cv_img)
+    return faces

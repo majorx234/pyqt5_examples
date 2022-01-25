@@ -3,13 +3,14 @@ import cv2
 import pyqtgraph as pg
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt, QMetaObject, QEvent
+from PyQt5.QtCore import Qt, QEvent
 from image_list_model import ImageListModel
 from image_item_datatype import ImageItem
 from image_item_delegate import ImageItemDelegate
 from cv_to_qt import cv_to_qt_image
 from ui_dynamic_list_widget import Ui_dynamic_list_widget
 import image_filter as ft
+import cv_utils as cu
 
 class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
     def __init__(self, parent=None):
@@ -31,7 +32,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.applyButton.clicked.connect(self.apply_filter)
         self.resetButton.clicked.connect(self.reset)
         self.resetFacedetectionButton.clicked.connect(self.resetFacedetection)
-        self.imageLabel.mousePressEvent = self.getPos
+        self.imageLabel.mousePressEvent = self.getFaceAtPos
         self.current_faces = []
         self.current_image = None
         self.selectedFacesListView.installEventFilter(self)
@@ -42,9 +43,6 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.scaleFactorHeight = 1.0
         self.labelWidth = 400
         self.labelHeight = 400
-
-    def whoDoubleclicked(self, index):
-        print("doubleclicked {}".format(index))
         
     def closeEvent(self, event):
             event.accept()
@@ -52,8 +50,8 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.selectedFacesListView:
             menu = QMenu(self)
-            menu.addAction("New")
-            menu.addAction("Open")
+            menu.addAction("Save")
+            menu.addAction("Delete")
 
             if menu.exec_(event.globalPos()):
                 item = source.itemAt(event.pos())
@@ -71,14 +69,9 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         filename = QFileDialog.getSaveFileName (filter="JPG (*.jpg);;PNG (*.png);;TIFF (*.tiff);;BMP (*.bmp)")[0]
         cv2.imwrite(filename, last_image)
         print ('Image saved as:', filename)
-
-    def selectFaceFromList(self, index, mouse_button):
-        print("i do nothing yet")
-        #if(mouse_button == ):
-            #create contextmenu
-            #saveFaceImage
             
     def saveFaceImage(self,index):
+        """This function will save a face image as file"""
         indexed_item = self.selectedFacesListModel.get_item(index)
         indexed_image = indexed_item.get_image()
         filename = QFileDialog.getSaveFileName (filter="JPG (*.jpg);;PNG (*.png);;TIFF (*.tiff);;BMP (*.bmp)")[0]
@@ -91,7 +84,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         
         # histogram
         histogram_plot = pg.PlotWidget()
-        y_axis = self.histogram(cv_image)
+        y_axis = cu.histogram(cv_image)
         x_axis = [x for x in range(255)]
         bargraph = pg.BarGraphItem(x = x_axis, height = y_axis, width = 1, pen ='g')
         histogram_plot.addItem(bargraph)
@@ -174,7 +167,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
             filtered_image = self.morphologicalGradient(last_image)
         elif(self.filterTabs.currentWidget() == self.facedetectionTab):
             filtered_image = last_image
-            self.current_faces = self.haarcascade_face_detection(last_image)
+            self.current_faces = ft.haarcascade_face_detection(last_image)
 
         image_item = ImageItem(thumb_width=128)
         image_item.set_image(filtered_image)
@@ -182,37 +175,10 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         
         self.current_image = filtered_image
         #draw faces in label
-        if(len(self.current_faces) !=0):
-            faces_img = last_image.copy()
-            #mark faces in image
-            for (x, y, w, h) in self.current_faces:
-                cv2.rectangle(faces_img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            filtered_image = faces_img    
-       
-        self.set_main_image(filtered_image)
+        self.set_main_image(cu.draw_rectangle_in_image(filtered_image.copy(), self.current_faces))
         
-    def histogram(self, cv_img):
-        # create greyscale image if needed:
-        grey_img = cv_img
-        if len(cv_img.shape) == 3:
-            grey_img = ft.greyscale(cv_img)
-        #pixelgenau zugriff
-        rows, cols = grey_img.shape
-        histogram = np.zeros(256)
-        for i in range(rows):
-            for j in range(cols):
-                k = grey_img[i,j]
-                histogram[k] += 1
-        return histogram
-
-    def haarcascade_face_detection(self, cv_img):
-        xml_cascade_file = '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
-        # detect face
-        face_cascade = cv2.CascadeClassifier(xml_cascade_file)
-        faces = face_cascade.detectMultiScale(cv_img)
-        return faces
-
-    def getPos(self, event):
+    def getFaceAtPos(self, event):
+        #doofer Name, splitten in Pos Methode und in Methode die wenn in Gesicht geklickt in Liste tun  
         label_x = event.pos().x()
         label_y = event.pos().y()
 
@@ -220,13 +186,11 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         p_y = label_y / self.scaleFactorHeight
 
         cv_img = self.current_image
-        if(len(self.current_faces)>0):
-            for (x, y, w, h) in self.current_faces:
-                if(p_y > y) and (p_y < y +h) and (p_x > x) and (p_x < x+w):
-                    face_image = cv_img[y:y+h, x:x+w]
-                    image_item = ImageItem(thumb_width=64)
-                    image_item.set_image(face_image)
-                    self.selectedFacesListModel.append(image_item)
+
+        image_item = ImageItem(thumb_width=64)
+        face_image = cu.cut_selecteced_rectangle_from_image(p_x, p_y, cv_img, self.current_faces)
+        image_item.set_image(face_image)
+        self.selectedFacesListModel.append(image_item)
 
     def get_selected_norm(self):
         return self.normCombobox.currentText()
