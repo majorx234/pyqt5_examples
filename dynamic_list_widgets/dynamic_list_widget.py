@@ -78,9 +78,9 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         cv2.imwrite(filename, indexed_image)
      
     def set_main_image(self, cv_image):
-        qt_image = cv_to_qt_image(cv_image)
-        (resized_image, self.scaledFactorWidth, self.scaleFactorHeight) = self.scaledImageToLabel(qt_image.copy(), self.labelWidth, self.labelHeight)
-        self.imageLabel.setPixmap(QPixmap.fromImage(resized_image))
+        (resized_cv_image, self.scaledFactorWidth, self.scaleFactorHeight) = cu.scaledImageToConstrains(cv_image, self.labelWidth, self.labelHeight)
+        qt_image = cv_to_qt_image(resized_cv_image)
+        self.imageLabel.setPixmap(QPixmap.fromImage(qt_image))
         
         # histogram
         histogram_plot = pg.PlotWidget()
@@ -120,26 +120,6 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         image_item.set_image(indexed_image.copy())
         self.set_main_image(indexed_image)
         self.historyListModel.append(image_item)
-
-    def scaledImageToLabel(self, qt_image : QImage, label_width, label_height ) -> (QImage, float, float):
-        image_width = qt_image.width()
-        image_height = qt_image.height()
-        ratio = image_width / image_height
-        scaledFactorWidth = 1.0
-        scaledFactorHeight = 1.0
-        if ratio == 1 :
-            resized_image = qt_image.scaledToWidth(label_width, mode=Qt.SmoothTransformation)
-            scaledFactorWidth = label_width/image_width
-            scaledFactorHeight = label_height/image_height
-        elif ratio < 1 :
-            resized_image = qt_image.scaledToHeight(label_height, mode=Qt.SmoothTransformation)
-            scaledFactorHeight = label_height/image_height
-            scaledFactorWidth = scaledFactorHeight
-        else : #ratio > 1:
-            resized_image = qt_image.scaledToWidth(label_width, mode=Qt.SmoothTransformation)
-            scaledFactorWidth = label_width/image_width
-            scaledFactorHeight = scaledFactorWidth
-        return resized_image, scaledFactorWidth, scaledFactorHeight
     
     def apply_filter(self,event=None):
         last_item = self.historyListModel.get_last_item()
