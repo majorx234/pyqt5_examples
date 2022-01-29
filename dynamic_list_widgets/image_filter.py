@@ -52,3 +52,11 @@ def haarcascade_face_detection(cv_img):
     face_cascade = cv2.CascadeClassifier(xml_cascade_file)
     faces = face_cascade.detectMultiScale(cv_img)
     return faces
+
+def haarcascade_eyes_detection(cv_img):
+    xml_cascade_file = '/usr/share/opencv4/haarcascades/haarcascade_eye_tree_eyeglasses.xml'
+    # detect face
+    eyes_cascade = cv2.CascadeClassifier(xml_cascade_file)
+    eyes = eyes_cascade.detectMultiScale(cv_img)
+    return eyes
+

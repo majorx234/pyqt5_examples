@@ -33,6 +33,7 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         self.resetFacedetectionButton.clicked.connect(self.resetFacedetection)
         self.imageLabel.mousePressEvent = self.getFaceAtPos
         self.current_faces = []
+        self.current_eyes  = []
         self.current_image = None
         self.selectedFacesListView.installEventFilter(self)
 
@@ -148,6 +149,8 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         elif(self.filterTabs.currentWidget() == self.facedetectionTab):
             filtered_image = last_image
             self.current_faces = ft.haarcascade_face_detection(last_image)
+            self.current_eyes = ft.haarcascade_eyes_detection(last_image)
+            print(self.current_eyes)
 
         image_item = ImageItem(thumb_width=128)
         image_item.set_image(filtered_image)
@@ -155,7 +158,10 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         
         self.current_image = filtered_image
         #draw faces in label
-        self.set_main_image(cu.draw_rectangle_in_image(filtered_image.copy(), self.current_faces))
+        face_color = (0, 0, 255)
+        face_image = cu.draw_rectangle_in_image(filtered_image.copy(), self.current_faces, face_color)
+        eyes_color = (255, 0, 0)
+        self.set_main_image(cu.draw_rectangle_in_image(face_image, self.current_eyes, eyes_color))
         
     def getFaceAtPos(self, event):
         #doofer Name, splitten in Pos Methode und in Methode die wenn in Gesicht geklickt in Liste tun  

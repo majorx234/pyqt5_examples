@@ -26,10 +26,10 @@ def scaledImageToConstrains(cv_image : np.ndarray, label_width, label_height ) -
         scaledFactorHeight = scaledFactorWidth
     return resized_image, scaledFactorWidth, scaledFactorHeight
 
-def draw_rectangle_in_image(cv_image,rectangle_list):
+def draw_rectangle_in_image(cv_image,rectangle_list, color):
     if(len(rectangle_list) !=0):
         for (x, y, w, h) in rectangle_list:
-            cv2.rectangle(cv_image, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            cv2.rectangle(cv_image, (x, y), (x + w, y + h), color, 2)
     return cv_image
 
 def histogram(cv_img):
