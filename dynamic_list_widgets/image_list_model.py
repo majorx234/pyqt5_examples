@@ -1,9 +1,28 @@
 from PyQt5.QtCore import Qt, QAbstractListModel
 
+class ImageListModelIterator():
+    def __init__(self, image_list_model):
+        self.image_list_model = image_list_model
+        self.index = 0
+
+    def __next__(self):
+        if self.index < self.image_list_model.size():
+            item = self.image_list_model.get_item(self.index)
+            self.index += 1
+            return item
+        raise StopIteration
+
 class ImageListModel(QAbstractListModel):
     def __init__(self, *args):
         super().__init__(*args)
         self.list = []
+
+    def __iter__(self):
+        for item in self.list:
+            return ImageListModelIterator(self)
+
+    def size(self):
+        return len(self.list)
 
     def rowCount(self, parent=None, *args, **kwargs):
         if parent:

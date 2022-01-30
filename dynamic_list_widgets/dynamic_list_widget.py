@@ -11,6 +11,7 @@ from cv_to_qt import cv_to_qt_image
 from ui_dynamic_list_widget import Ui_dynamic_list_widget
 import image_filter as ft
 import cv_utils as cu
+from os.path import expanduser
 
 class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
     def __init__(self, parent=None):
@@ -50,13 +51,34 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
     def eventFilter(self, source, event):
         if event.type() == QEvent.ContextMenu and source is self.selectedFacesListView:
             menu = QMenu(self)
-            menu.addAction("Save")
-            menu.addAction("Delete")
-
-            if menu.exec_(event.globalPos()):
+            save_img = menu.addAction("Save")
+            delete_img = menu.addAction("Delete")
+            save_all_img = menu.addAction("SaveAll")
+            menu_click = menu.exec(event.globalPos())
+            model_index = 0
+            try:
                 model_index = self.selectedFacesListView.indexAt(event.pos())
+            except Exception as e:
+                print(f"No item selected {e}")
+
+            if menu_click == save_img:
+                print("Save")
+                #model_index = self.selectedFacesListView.indexAt(event.pos())
                 filename = QFileDialog.getSaveFileName (filter="JPG (*.jpg);;PNG (*.png);;TIFF (*.tiff);;BMP (*.bmp)")[0]
                 cv2.imwrite(filename, model_index.data().get_image())
+            elif menu_click == delete_img:
+                print("Delete")
+            elif menu_click == save_all_img:
+                print("SaveAll")
+                filepath = QFileDialog.getExistingDirectory(self, "Open Directory",
+                                             expanduser("~"),
+                                             QFileDialog.ShowDirsOnly)
+                i = 0
+                for item in self.selectedFacesListModel:
+                    filename = filepath + "/" + str(i) + ".jpg"
+                    image = item.get_image();
+                    cv2.imwrite(filename,image)
+                    i += 1
                 return True
         return super().eventFilter(source, event)
  
