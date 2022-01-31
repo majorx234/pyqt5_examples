@@ -1,0 +1,18 @@
+##### Emacs
+# -*- mode: gitignore; -*-
+*~
+\#*\#
+__pycache__/
+material/
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+*.jpg
+*.jpeg
+*.png
+*.txt
+*.bkp
+ui*.py
