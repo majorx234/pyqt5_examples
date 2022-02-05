@@ -46,17 +46,26 @@ def morphologicalGradient(cv_img):
     kernel = np.ones((5,5), np.uint8)
     return cv2.morphologyEx(cv_img, cv2.MORPH_GRADIENT, kernel)
  
-def haarcascade_face_detection(cv_img):
+def haarcascade_face_detection(cv_img, scale_factor = 1.1, min_neighbors = 3, flags = 0, min_size = (30,30),max_size = (800,600)):
     xml_cascade_file = '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
     # detect face
     face_cascade = cv2.CascadeClassifier(xml_cascade_file)
-    faces = face_cascade.detectMultiScale(cv_img)
+    faces = face_cascade.detectMultiScale(cv_img,
+                                          scaleFactor=scale_factor,
+                                          minNeighbors = min_neighbors,
+                                          minSize=min_size,
+                                          maxSize=max_size)
     return faces
 
-def haarcascade_eyes_detection(cv_img):
+def haarcascade_eyes_detection(cv_img, scale_factor = 1.1, min_neighbors = 3, flags = 0, min_size = (30,30),max_size = (800,600)):
     xml_cascade_file = '/usr/share/opencv4/haarcascades/haarcascade_eye_tree_eyeglasses.xml'
     # detect face
     eyes_cascade = cv2.CascadeClassifier(xml_cascade_file)
-    eyes = eyes_cascade.detectMultiScale(cv_img)
+    eyes = eyes_cascade.detectMultiScale(cv_img,
+                                         scaleFactor=scale_factor,
+                                         minNeighbors = min_neighbors,
+                                         minSize=min_size,
+                                         maxSize=max_size)
     return eyes
 
+   

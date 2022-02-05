@@ -104,6 +104,9 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         (resized_cv_image, self.scaledFactorWidth, self.scaleFactorHeight) = cu.scaledImageToConstrains(cv_image, self.labelWidth, self.labelHeight)
         qt_image = cv_to_qt_image(resized_cv_image)
         self.imageLabel.setPixmap(QPixmap.fromImage(qt_image))
+        (height, width,_) = cv_image.shape
+        self.xValueLabel.setNum(width)
+        self.yValueLabel.setNum(height)
         
         # histogram
         histogram_plot = pg.PlotWidget()
@@ -167,11 +170,25 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
         elif(self.filterTabs.currentWidget() == self.dilationTab):
             filtered_image =  ft.dilation(last_image)
         elif(self.filterTabs.currentWidget() == self.morphologicalGradientTab):
-            filtered_image = self.morphologicalGradient(last_image)
+            filtered_image = ft.morphologicalGradient(last_image)
         elif(self.filterTabs.currentWidget() == self.facedetectionTab):
             filtered_image = last_image
-            self.current_faces = ft.haarcascade_face_detection(last_image)
-            self.current_eyes = ft.haarcascade_eyes_detection(last_image)
+            (face_scale_factor, face_min_neighbors, face_min_size_x, face_min_size_y, face_max_size_x, face_max_size_y) = self.get_facedetect_params()
+            self.current_faces = ft.haarcascade_face_detection(last_image,
+                                                               face_scale_factor,
+                                                               face_min_neighbors,
+                                                               flags = 0,
+                                                               min_size =(face_min_size_x, face_min_size_y),
+                                                               max_size = (face_max_size_x, face_max_size_y))
+
+            (eyes_scale_factor, eyes_min_neighbors, eyes_min_size_x, eyes_min_size_y, eyes_max_size_x, eyes_max_size_y) = self.get_eyesdetect_params()
+            self.current_eyes = ft.haarcascade_eyes_detection(last_image,
+                                                              eyes_scale_factor,
+                                                              eyes_min_neighbors,
+                                                              flags = 0,
+                                                              min_size = (eyes_min_size_x, eyes_min_size_y),
+                                                              max_size = (eyes_max_size_x, eyes_max_size_y))
+            print(self.current_faces)
             print(self.current_eyes)
 
         image_item = ImageItem(thumb_width=128)
@@ -218,4 +235,26 @@ class DynamicListWidget(QWidget, Ui_dynamic_list_widget):
                         [x3,x4,x5],
                         [x6,x7,x8]])
 
-    
+    def get_facedetect_params(self):
+        scale_factor  = float(self.scaleFactorTextEdit.toPlainText())
+        min_neighbors = int(self.minNeighborsTextEdit.toPlainText())
+        min_size_x    = int(self.minSizeXTextEdit.toPlainText())
+        min_size_y    = int(self.minSizeYTextEdit.toPlainText())
+        max_size_x    = int(self.maxSizeXTextEdit.toPlainText())
+        max_size_y    = int(self.maxSizeYTextEdit.toPlainText())
+
+        return (scale_factor, min_neighbors,
+                min_size_x, min_size_y,
+                max_size_x, max_size_y)
+
+    def get_eyesdetect_params(self):
+        scale_factor  = float(self.scaleFactorTextEdit_2.toPlainText())
+        min_neighbors = int(self.minNeighborsTextEdit_2.toPlainText())
+        min_size_x    = int(self.minSizeXTextEdit_2.toPlainText())
+        min_size_y    = int(self.minSizeYTextEdit_2.toPlainText())
+        max_size_x    = int(self.maxSizeXTextEdit_2.toPlainText())
+        max_size_y    = int(self.maxSizeYTextEdit_2.toPlainText())
+
+        return (scale_factor, min_neighbors,
+                min_size_x, min_size_y,
+                max_size_x, max_size_y)
