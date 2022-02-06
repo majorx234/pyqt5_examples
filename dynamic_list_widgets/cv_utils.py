@@ -59,7 +59,7 @@ def Distance(p1,p2):
   dy = p2[1] - p1[1]
   return math.sqrt(dx*dx+dy*dy)
 
-def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None, resample=cv2.INTER_CUBIC):
+def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale = None, resample=Image.BILINEAR):
   if (scale is None) and (center is None):
     return image.rotate(angle=angle, resample=resample)
   nx,ny = x,y = center
@@ -76,7 +76,7 @@ def ScaleRotateTranslate(image, angle, center = None, new_center = None, scale =
   d = -sine/sy
   e = cosine/sy
   f = y-nx*d-ny*e
-  return image.transform(image.size, cv2.AFFINE, (a,b,c,d,e,f), resample=resample)
+  return image.transform(image.size, Image.AFFINE, (a,b,c,d,e,f), resample=resample)
 
 #offset_pct=(0.3,0.3), dest_sz=(168,192)
 def CropFace(image, eye_left=(0,0), eye_right=(0,0), offset_pct=(0.2,0.2), dest_sz = (70,70)):
@@ -100,5 +100,5 @@ def CropFace(image, eye_left=(0,0), eye_right=(0,0), offset_pct=(0.2,0.2), dest_
   crop_size = (dest_sz[0]*scale, dest_sz[1]*scale)
   image = image.crop((int(crop_xy[0]), int(crop_xy[1]), int(crop_xy[0]+crop_size[0]), int(crop_xy[1]+crop_size[1])))
   # resize it
-  image = image.resize(dest_sz, cv2.ANTIALIAS)
+  image = image.resize(dest_sz, Image.ANTIALIAS)
   return image
