@@ -1,5 +1,7 @@
+#! /usr/bin/python
 import sys
 import cv2
+import numpy as np
 from pathlib import Path
 
 def read_csv(filename):
@@ -35,30 +37,40 @@ def mark_faces(image, faces):
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
 def get_user(prediction):
-    users = {0: 'person_0', 1: 'person_1', 2: 'person_2'}
+    users = {0: 'person_0', 1: 'person_1', 2: 'person_2', 3: 'wer anners', 4: 'constantine' }
     return users[prediction]
 
 def main(video_file, csv_file = 'faces.csv'):
-    home = str(Path.home())
-    xml = 'cv_workspace/opencv/data/haarcascades/haarcascade_frontalface_default.xml'
-    cascade_file = '%s/%s' % (home, xml)
+    cascade_file = '/usr/share/opencv4/haarcascades/haarcascade_frontalface_default.xml'
 
     images, labels = read_csv(csv_file)
+    print("csv_loaded")
 
     model = create_and_train_model(images, labels)
-
+    print("model trained")
     cap = cv2.VideoCapture(video_file)
     while True:
-        ret, img = cap.read()
-        assert ret
-
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = detect_faces(img, cascade_file)
+        ret = 0
+        img = np.zeros((480,640,3), np.uint8)
+        not_ok = True
+        while(not_ok):
+            ret, img = cap.read()
+            if img is None:
+                not_ok = True
+            else:
+                not_ok = False
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            break
+        assert ret 
+        grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        faces = detect_faces(grey, cascade_file )
         mark_faces(img, faces)
 
         user = ''
+        
         for (x, y, w, h) in faces:
-            face_img = gray[y:y + h, x:x + w]
+            face_img = grey[y:y + h, x:x + w]
             img_h, img_w = images[0].shape[:2]
             face_res = cv2.resize(face_img, (img_w, img_h))
 
@@ -78,10 +90,11 @@ def main(video_file, csv_file = 'faces.csv'):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3:
         print("usage: train_model <videofile> <csv file with images;ids>")
         sys.exit(1)
 
-    video_file=sys.argv[1]    
+    video_file=sys.argv[1]
     csv_file=sys.argv[2]
-    main(csv_file)
+    print("start main")
+    main(video_file, csv_file)
